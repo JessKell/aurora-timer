@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pomodoro</title>
+
+<style>
+:root{
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.6);
+  --line:rgba(255,255,255,.14);
+  --focus:rgba(122,231,199,.6);
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  transition:background .9s linear;
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(122,231,199,.16), transparent 62%),
+    radial-gradient(980px 680px at 75% 18%, rgba(140,160,255,.12), transparent 60%),
+    radial-gradient(1200px 820px at 55% 88%, rgba(42,245,152,.08), transparent 60%),
+    linear-gradient(180deg,#050c14,#091b2c);
+  overflow:hidden;
+}
+
+/* Aurora Haze */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-25%;
+  pointer-events:none;
+  opacity:.95;
+  background:
+    radial-gradient(1100px 620px at 20% 25%, rgba(42,245,152,.24), transparent 60%),
+    radial-gradient(1200px 700px at 70% 25%, rgba(122,231,199,.20), transparent 62%),
+    radial-gradient(1200px 760px at 55% 70%, rgba(140,160,255,.16), transparent 62%),
+    radial-gradient(900px 520px at 30% 75%, rgba(255,80,200,.08), transparent 70%);
+  filter: blur(26px) saturate(1.55);
+  mix-blend-mode: screen;
+  transform: translate3d(0,0,0);
+  animation: auroraHaze 22s ease-in-out infinite alternate;
+}
+
+/* Aurora Bands (more defined ribbons) */
+body::after{
+  content:"";
+  position:fixed;
+  inset:-30% -10% -25% -10%;
+  pointer-events:none;
+  opacity:.9;
+  background:
+    radial-gradient(1100px 240px at 22% 42%, rgba(42,245,152,.26), transparent 62%),
+    radial-gradient(1200px 260px at 70% 46%, rgba(122,231,199,.22), transparent 64%),
+    radial-gradient(1100px 240px at 45% 56%, rgba(140,160,255,.20), transparent 66%),
+    radial-gradient(900px 220px at 55% 34%, rgba(255,80,200,.10), transparent 70%);
+  filter: blur(16px) saturate(1.65);
+  mix-blend-mode: screen;
+  transform: translate3d(0,0,0);
+  animation: auroraBands 28s ease-in-out infinite alternate;
+}
+
+@keyframes auroraHaze{
+  0%   { transform: translate(-1.4%, -1.0%) scale(1.03); }
+  50%  { transform: translate( 1.6%,  1.2%) scale(1.07); }
+  100% { transform: translate(-1.0%,  1.6%) scale(1.04); }
+}
+
+@keyframes auroraBands{
+  0%   { transform: translate(-2.5%, -1.8%) rotate(-2.2deg) scale(1.03); }
+  50%  { transform: translate( 2.8%,  1.5%) rotate( 1.4deg) scale(1.09); }
+  100% { transform: translate(-1.8%,  2.2%) rotate(-1.2deg) scale(1.05); }
+}
+
+/* Slight lift in last 20 seconds (still elegant) */
+body.urgent::before{
+  opacity:1;
+  filter: blur(25px) saturate(1.65);
+}
+body.urgent::after{
+  opacity:1;
+  filter: blur(15px) saturate(1.75);
+}
+
+/* Finished: calm highlight */
+body.finish::before{
+  opacity:1;
+  filter: blur(25px) saturate(1.70);
+}
+body.finish::after{
+  opacity:1;
+  filter: blur(15px) saturate(1.80);
+}
+
+/* App content */
+.app{
+  width:min(560px,92vw);
+  padding:28px 22px 40px;
+  position:relative;
+  z-index:2;
+}
+
+h1{
+  margin:0 0 18px;
+  font-size:22px;
+  font-weight:650;
+}
+
+.task{
+  width:100%;
+  padding:12px 0;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--line);
+  color:var(--text);
+  outline:none;
+  font-size:15px;
+}
+.task::placeholder{ color:var(--muted); }
+.task:focus{ border-bottom-color:var(--focus); }
+
+.timerRow{
+  display:grid;
+  grid-template-columns:52px 1fr 52px;
+  align-items:center;
+  gap:16px;
+  margin:32px 0 20px;
+}
+
+.timer{
+  text-align:center;
+  font-size:76px;
+  font-weight:750;
+  letter-spacing:1px;
+  padding:14px 0;
+  will-change: transform;
+}
+
+/* Round +/- buttons */
+.iconBtn{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s;
+}
+
+.iconBtn:hover{
+  background:rgba(255,255,255,.05);
+  border-color:rgba(255,255,255,.25);
+  transform:translateY(-1px) scale(1.03);
+}
+.iconBtn:active{ transform:scale(.96); }
+.iconBtn:disabled{ opacity:.35; cursor:not-allowed; transform:none; }
+
+.icon{
+  font-size:30px;
+  font-weight:700;
+  line-height:1;
+}
+
+.controls{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin-top:6px;
+}
+
+.btn{
+  padding:11px 18px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--text);
+  cursor:pointer;
+  font-size:14px;
+  transition:.15s;
+}
+
+.btn:hover{
+  background:rgba(255,255,255,.05);
+  border-color:rgba(255,255,255,.25);
+  transform:translateY(-1px);
+}
+.btn:active{ transform:scale(.97); }
+
+.btnPrimary{ border-color:rgba(122,231,199,.55); }
+.btnPrimary:hover{
+  background:rgba(122,231,199,.10);
+  border-color:rgba(122,231,199,.80);
+}
+
+/* Urgency: last 20 seconds — subtle */
+.pulse{
+  animation:pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.012); }
+}
+
+/* Finish feedback: elegant + restrained */
+.done{
+  animation: finishGlow 1.8s ease 2;
+}
+@keyframes finishGlow{
+  0%{ text-shadow:none; }
+  50%{ text-shadow:0 0 10px rgba(122,231,199,.32); }
+  100%{ text-shadow:none; }
+}
+
+/* Pine silhouette at bottom */
+.pines{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:160px;
+  z-index:1;
+  pointer-events:none;
+  opacity:.95;
+}
+
+.pines svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.pines .fade{
+  fill: url(#fade);
+}
+</style>
+</head>
+
+<body>
+  <div class="app">
+    <h1>Let’s do this now!</h1>
+
+    <input
+      id="task"
+      class="task"
+      type="text"
+      placeholder="I want to achieve..."
+      aria-label="Task for this Pomodoro"
+    />
+
+    <div class="timerRow">
+      <button id="minusBtn" class="iconBtn" aria-label="Subtract 5 minutes" title="- 5 min">
+        <span class="icon">–</span>
+      </button>
+
+      <div id="timer" class="timer" aria-live="polite">25:00</div>
+
+      <button id="plusBtn" class="iconBtn" aria-label="Add 5 minutes" title="+ 5 min">
+        <span class="icon">+</span>
+      </button>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="btn btnPrimary">Start</button>
+      <button id="pauseBtn" class="btn">Pause</button>
+      <button id="resetBtn" class="btn">Reset</button>
+    </div>
+  </div>
+
+  <!-- Pine tree silhouette (inline SVG, no external files) -->
+  <div class="pines" aria-hidden="true">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- slight fade up so it blends into the sky -->
+        <linearGradient id="fade" x1="0" x2="0" y1="1" y2="0">
+          <stop offset="0%" stop-color="#000" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#000" stop-opacity=".0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Base silhouette -->
+      <path class="fade" d="
+        M0,200
+        L0,130
+        L30,150 L55,120 L75,150
+        L95,110 L120,150
+        L150,105 L175,150
+        L205,115 L230,150
+        L260,95  L290,150
+        L320,120 L350,150
+        L380,90  L410,150
+        L440,110 L470,150
+        L500,80  L530,150
+        L560,115 L590,150
+        L620,100 L650,150
+        L680,120 L710,150
+        L740,95  L770,150
+        L800,110 L830,150
+        L860,85  L890,150
+        L920,120 L950,150
+        L980,100 L1010,150
+        L1040,115 L1070,150
+        L1100,95 L1130,150
+        L1160,110 L1185,150
+        L1200,135
+        L1200,200 Z" />
+
+      <!-- Extra tree spikes for depth -->
+      <path d="
+        M0,200 L0,165
+        L40,180 L70,155 L95,182
+        L140,150 L165,185
+        L220,145 L245,188
+        L300,140 L330,188
+        L380,150 L405,190
+        L470,138 L500,192
+        L560,155 L590,192
+        L650,148 L680,192
+        L740,142 L770,192
+        L830,150 L860,192
+        L920,145 L950,192
+        L1010,152 L1040,192
+        L1100,145 L1130,192
+        L1200,170 L1200,200 Z"
+        fill="#000" opacity=".55"/>
+    </svg>
+  </div>
+
+<script>
+const MIN = 5*60;
+const MAX = 60*60;
+const STEP = 5*60;
+
+let total = 25*60;
+let time = total;
+let interval = null;
+
+const timerEl = document.getElementById("timer");
+const minusBtn = document.getElementById("minusBtn");
+const plusBtn  = document.getElementById("plusBtn");
+const bodyEl   = document.body;
+
+function format(sec){
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return `${m}:${String(s).padStart(2,"0")}`;
+}
+
+function aurora(p){
+  // Keep hue drift inside aurora range but brighter
+  const h1 = 155 + 95*p; // teal -> violet
+  const h2 = 120 + 70*p; // green -> teal/blue
+  const h3 = 215 + 34*p; // violet drift
+  const glow = .12 + .14*p; // brighter overall
+
+  bodyEl.style.background = `
+    radial-gradient(1200px 800px at 20% 10%, hsla(${h2},95%,66%,${glow}), transparent 62%),
+    radial-gradient(980px 680px at 75% 18%, hsla(${h3},95%,72%,${glow*.85}), transparent 60%),
+    radial-gradient(1200px 820px at 55% 88%, hsla(${h1},95%,60%,${glow*.75}), transparent 60%),
+    linear-gradient(180deg,#050c14,#091b2c)
+  `;
+}
+
+function refresh(){
+  timerEl.textContent = format(time);
+
+  let p = 1 - (time/total);
+  p = Math.max(0, Math.min(1, p));
+  aurora(p);
+
+  const running = Boolean(interval);
+  minusBtn.disabled = running || time <= MIN;
+  plusBtn.disabled  = running || time >= MAX;
+
+  const urgent = running && time <= 20 && time > 0;
+  timerEl.classList.toggle("pulse", urgent);
+  bodyEl.classList.toggle("urgent", urgent);
+
+  bodyEl.classList.toggle("finish", time === 0);
+}
+
+function tick(){
+  if (time <= 0) { finish(); return; }
+  time -= 1;
+  refresh();
+}
+
+function start(){
+  if (interval) return;
+  timerEl.classList.remove("done");
+  interval = setInterval(tick, 1000);
+  refresh();
+}
+
+function pause(){
+  clearInterval(interval);
+  interval = null;
+  refresh();
+}
+
+function reset(){
+  pause();
+  time = total;
+  timerEl.classList.remove("done");
+  bodyEl.classList.remove("urgent","finish");
+  refresh();
+}
+
+function finish(){
+  pause();
+  time = 0;
+  timerEl.classList.remove("pulse");
+  timerEl.classList.add("done");
+  bodyEl.classList.remove("urgent");
+  bodyEl.classList.add("finish");
+  refresh();
+}
+
+function adjust(dir){
+  if (interval) return;
+  time = Math.max(MIN, Math.min(MAX, time + dir*STEP));
+  total = time;
+  timerEl.classList.remove("done");
+  bodyEl.classList.remove("finish");
+  refresh();
+}
+
+minusBtn.onclick = () => adjust(-1);
+plusBtn.onclick  = () => adjust(1);
+
+document.getElementById("startBtn").onclick = start;
+document.getElementById("pauseBtn").onclick = pause;
+document.getElementById("resetBtn").onclick = reset;
+
+refresh();
+</script>
+</body>
+</html>
