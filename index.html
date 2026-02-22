@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Pomodoro</title>
+<title>Aurora Pomodoro</title>
 
 <style>
 :root{
@@ -21,7 +21,7 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  font-family:system-ui,'Times New Roman', Times, serif;
   color:var(--text);
   transition:background .9s linear;
   background:
@@ -50,7 +50,7 @@ body::before{
   animation: auroraHaze 22s ease-in-out infinite alternate;
 }
 
-/* Aurora Bands (more defined ribbons) */
+/* Aurora Bands */
 body::after{
   content:"";
   position:fixed;
@@ -73,14 +73,13 @@ body::after{
   50%  { transform: translate( 1.6%,  1.2%) scale(1.07); }
   100% { transform: translate(-1.0%,  1.6%) scale(1.04); }
 }
-
 @keyframes auroraBands{
   0%   { transform: translate(-2.5%, -1.8%) rotate(-2.2deg) scale(1.03); }
   50%  { transform: translate( 2.8%,  1.5%) rotate( 1.4deg) scale(1.09); }
   100% { transform: translate(-1.8%,  2.2%) rotate(-1.2deg) scale(1.05); }
 }
 
-/* Slight lift in last 20 seconds (still elegant) */
+/* Slight lift in last 20 seconds */
 body.urgent::before{
   opacity:1;
   filter: blur(25px) saturate(1.65);
@@ -90,7 +89,7 @@ body.urgent::after{
   filter: blur(15px) saturate(1.75);
 }
 
-/* Finished: calm highlight */
+/* Finished */
 body.finish::before{
   opacity:1;
   filter: blur(25px) saturate(1.70);
@@ -100,15 +99,29 @@ body.finish::after{
   filter: blur(15px) saturate(1.80);
 }
 
-/* App content */
-.app{
-  width:min(560px,92vw);
-  padding:28px 22px 40px;
+/* Layout container: timer left, log right */
+.shell{
+  width:min(1040px, 92vw);
+  display:grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 46px;
+  align-items:start;
   position:relative;
-  z-index:2;
+  z-index:3;
+  padding: 28px 22px 20px;
+  margin-bottom: 260px;
 }
 
-h1{
+@media (max-width: 860px){
+  .shell{
+    grid-template-columns: 1fr;
+    gap: 120px;
+    margin-bottom: 300px;
+  }
+}
+
+/* Left: timer panel */
+.left h1{
   margin:0 0 18px;
   font-size:22px;
   font-weight:650;
@@ -132,7 +145,7 @@ h1{
   grid-template-columns:52px 1fr 52px;
   align-items:center;
   gap:16px;
-  margin:32px 0 20px;
+  margin:32px 0 22px;
 }
 
 .timer{
@@ -149,7 +162,7 @@ h1{
   width:52px;
   height:52px;
   border-radius:50%;
-  border:1px solid var(--line);
+  border:0px solid var(--line);
   background:transparent;
   color:var(--text);
   cursor:pointer;
@@ -158,7 +171,6 @@ h1{
   justify-content:center;
   transition:.15s;
 }
-
 .iconBtn:hover{
   background:rgba(255,255,255,.05);
   border-color:rgba(255,255,255,.25);
@@ -167,22 +179,20 @@ h1{
 .iconBtn:active{ transform:scale(.96); }
 .iconBtn:disabled{ opacity:.35; cursor:not-allowed; transform:none; }
 
-.icon{
-  font-size:30px;
-  font-weight:700;
-  line-height:1;
-}
+.icon{ font-size:30px; font-weight:700; line-height:1; }
 
+/* Center these buttons */
 .controls{
   display:flex;
   gap:12px;
   justify-content:center;
   margin-top:6px;
+  flex-wrap:wrap;
 }
 
 .btn{
   padding:11px 18px;
-  border-radius:10px;
+  border-radius:0px;
   border:1px solid var(--line);
   background:transparent;
   color:var(--text);
@@ -190,7 +200,6 @@ h1{
   font-size:14px;
   transition:.15s;
 }
-
 .btn:hover{
   background:rgba(255,255,255,.05);
   border-color:rgba(255,255,255,.25);
@@ -213,7 +222,7 @@ h1{
   50%{ transform:scale(1.012); }
 }
 
-/* Finish feedback: elegant + restrained */
+/* Finish feedback */
 .done{
   animation: finishGlow 1.8s ease 2;
 }
@@ -223,126 +232,215 @@ h1{
   100%{ text-shadow:none; }
 }
 
-/* Pine silhouette at bottom */
+/* Right: Today log */
+.rightTop{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-top: 4px;
+}
+
+.rightTitle{
+  font-size:13px;
+  color:rgba(255,255,255,.78);
+  letter-spacing:.2px;
+}
+
+.rightTotal{
+  font-size:13px;
+  color:rgba(255,255,255,.78);
+}
+
+/* List */
+.log{
+  margin: 12px 0 0;
+  padding:0;
+  list-style:none;
+  display:grid;
+  gap:10px;
+}
+
+.logItem{
+  padding:12px 12px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:0px;
+  background: rgba(0,0,0,.18);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.logTask{
+  color:rgba(255,255,255,.86);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width: 66%;
+}
+
+.logRight{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex: 0 0 auto;
+}
+
+.logMeta{
+  color:rgba(255,255,255,.62);
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.logEmpty{
+  opacity:.75;
+}
+
+/* Delete icon button per entry */
+.deleteBtn{
+  border:none;
+  background:transparent;
+  color:rgba(255,255,255,.55);
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  padding:4px 8px;
+  border-radius:0px;
+  transition:.15s;
+}
+.deleteBtn:hover{
+  color:rgba(255,138,138,.95);
+  background:rgba(255,255,255,.06);
+}
+.deleteBtn:active{
+  transform: scale(.96);
+}
+
+/* Pines stay the same */
 .pines{
   position:fixed;
   left:0;
   right:0;
   bottom:0;
-  height:160px;
+  height: 300px;
   z-index:1;
   pointer-events:none;
-  opacity:.95;
+  opacity:.98;
 }
-
-.pines svg{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-.pines .fade{
-  fill: url(#fade);
-}
+.pines svg{ width:100%; height:100%; display:block; }
+.pines .fade{ fill:url(#fade); }
 </style>
 </head>
 
 <body>
-  <div class="app">
-    <h1>Let’s do this now!</h1>
+  <div class="shell">
+    <!-- LEFT: Timer -->
+    <div class="left">
+      <h1>Aurora Timer</h1>
 
-    <input
-      id="task"
-      class="task"
-      type="text"
-      placeholder="I want to achieve..."
-      aria-label="Task for this Pomodoro"
-    />
+      <input
+        id="task"
+        class="task"
+        type="text"
+        placeholder="In this session I'll be working on..."
+        aria-label="Task for this Pomodoro"
+        required
+      />
 
-    <div class="timerRow">
-      <button id="minusBtn" class="iconBtn" aria-label="Subtract 5 minutes" title="- 5 min">
-        <span class="icon">–</span>
-      </button>
+      <div class="timerRow">
+        <button id="minusBtn" class="iconBtn" aria-label="Subtract 5 minutes" title="- 5 min">
+          <span class="icon">–</span>
+        </button>
 
-      <div id="timer" class="timer" aria-live="polite">25:00</div>
+        <div id="timer" class="timer" aria-live="polite">25:00</div>
 
-      <button id="plusBtn" class="iconBtn" aria-label="Add 5 minutes" title="+ 5 min">
-        <span class="icon">+</span>
-      </button>
+        <button id="plusBtn" class="iconBtn" aria-label="Add 5 minutes" title="+ 5 min">
+          <span class="icon">+</span>
+        </button>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn" class="btn btnPrimary">Start</button>
+        <button id="pauseBtn" class="btn">Pause</button>
+        <button id="resetBtn" class="btn">Reset</button>
+      </div>
     </div>
 
-    <div class="controls">
-      <button id="startBtn" class="btn btnPrimary">Start</button>
-      <button id="pauseBtn" class="btn">Pause</button>
-      <button id="resetBtn" class="btn">Reset</button>
+    <!-- RIGHT: Log -->
+    <div class="right" aria-live="polite">
+      <div class="rightTop">
+        <div class="rightTitle">Today’s sessions</div>
+        <div id="todayTotal" class="rightTotal">0 min</div>
+      </div>
+
+      <ul id="todayList" class="log" aria-label="Focus sessions completed today"></ul>
     </div>
   </div>
 
-  <!-- Pine tree silhouette (inline SVG, no external files) -->
+  <!-- Pine tree silhouette (unchanged) -->
   <div class="pines" aria-hidden="true">
-    <svg viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 1200 260" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- slight fade up so it blends into the sky -->
         <linearGradient id="fade" x1="0" x2="0" y1="1" y2="0">
           <stop offset="0%" stop-color="#000" stop-opacity="1"/>
           <stop offset="100%" stop-color="#000" stop-opacity=".0"/>
         </linearGradient>
       </defs>
 
-      <!-- Base silhouette -->
       <path class="fade" d="
-        M0,200
-        L0,130
-        L30,150 L55,120 L75,150
-        L95,110 L120,150
-        L150,105 L175,150
-        L205,115 L230,150
-        L260,95  L290,150
-        L320,120 L350,150
-        L380,90  L410,150
-        L440,110 L470,150
-        L500,80  L530,150
-        L560,115 L590,150
-        L620,100 L650,150
-        L680,120 L710,150
-        L740,95  L770,150
-        L800,110 L830,150
-        L860,85  L890,150
-        L920,120 L950,150
-        L980,100 L1010,150
-        L1040,115 L1070,150
-        L1100,95 L1130,150
-        L1160,110 L1185,150
-        L1200,135
-        L1200,200 Z" />
+        M0,260
+        L0,160
+        L30,190 L55,150 L75,190
+        L95,140 L120,190
+        L150,135 L175,190
+        L205,145 L230,190
+        L260,125  L290,190
+        L320,150 L350,190
+        L380,120  L410,190
+        L440,140 L470,190
+        L500,110  L530,190
+        L560,145 L590,190
+        L620,130 L650,190
+        L680,150 L710,190
+        L740,125  L770,190
+        L800,140 L830,190
+        L860,115  L890,190
+        L920,150 L950,190
+        L980,130 L1010,190
+        L1040,145 L1070,190
+        L1100,125 L1130,190
+        L1160,140 L1185,190
+        L1200,170
+        L1200,260 Z" />
 
-      <!-- Extra tree spikes for depth -->
       <path d="
-        M0,200 L0,165
-        L40,180 L70,155 L95,182
-        L140,150 L165,185
-        L220,145 L245,188
-        L300,140 L330,188
-        L380,150 L405,190
-        L470,138 L500,192
-        L560,155 L590,192
-        L650,148 L680,192
-        L740,142 L770,192
-        L830,150 L860,192
-        L920,145 L950,192
-        L1010,152 L1040,192
-        L1100,145 L1130,192
-        L1200,170 L1200,200 Z"
+        M0,260 L0,205
+        L40,225 L70,190 L95,228
+        L140,182 L165,232
+        L220,176 L245,236
+        L300,170 L330,236
+        L380,182 L405,240
+        L470,168 L500,244
+        L560,190 L590,244
+        L650,180 L680,244
+        L740,172 L770,244
+        L830,182 L860,244
+        L920,176 L950,244
+        L1010,188 L1040,244
+        L1100,176 L1130,244
+        L1200,210 L1200,260 Z"
         fill="#000" opacity=".55"/>
     </svg>
   </div>
 
 <script>
-const MIN = 5*60;
-const MAX = 60*60;
-const STEP = 5*60;
+/* ---------- Timer ---------- */
+const MIN = 5 * 60;
+const MAX = 60 * 60;
+const STEP = 5 * 60;
 
-let total = 25*60;
+let total = 25 * 60;
 let time = total;
 let interval = null;
 
@@ -350,19 +448,119 @@ const timerEl = document.getElementById("timer");
 const minusBtn = document.getElementById("minusBtn");
 const plusBtn  = document.getElementById("plusBtn");
 const bodyEl   = document.body;
+const taskEl   = document.getElementById("task");
 
-function format(sec){
-  const m = Math.floor(sec/60);
-  const s = sec%60;
-  return `${m}:${String(s).padStart(2,"0")}`;
+/* ---------- Storage (localStorage) ---------- */
+const STORAGE_KEY = "auroraFocusLog_v1";
+
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+function loadLog(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+  catch{ return []; }
+}
+
+function saveLog(log){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+}
+
+function minutesLabel(sec){
+  const min = Math.round(sec / 60);
+  return `${min} min`;
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function addSession({ task, seconds }){
+  const cleanTask = (task || "").trim();
+  if (!cleanTask) return;
+
+  const entry = {
+    id: `${Date.now()}_${Math.random().toString(16).slice(2)}`,
+    date: todayKey(),
+    task: cleanTask,
+    seconds: seconds,
+    at: Date.now()
+  };
+
+  const log = loadLog();
+  log.push(entry);
+  saveLog(log);
+}
+
+function removeSession(id){
+  const log = loadLog();
+  const filtered = log.filter(x => x.id !== id);
+  saveLog(filtered);
+  renderTodaySummary();
+}
+
+/* ---------- UI: Today list ---------- */
+const todayTotalEl = document.getElementById("todayTotal");
+const todayListEl  = document.getElementById("todayList");
+
+function renderTodaySummary(){
+  const log = loadLog();
+  const today = todayKey();
+  const todays = log
+    .filter(x => x.date === today)
+    .sort((a,b) => (b.at||0) - (a.at||0));
+
+  const totalSeconds = todays.reduce((sum, x) => sum + (Number(x.seconds) || 0), 0);
+  todayTotalEl.textContent = minutesLabel(totalSeconds);
+
+  todayListEl.innerHTML = "";
+
+  if (todays.length === 0){
+    const li = document.createElement("li");
+    li.className = "logItem logEmpty";
+    li.innerHTML = `<span class="logTask">No sessions logged yet.</span><span class="logRight"><span class="logMeta">—</span></span>`;
+    todayListEl.appendChild(li);
+    return;
+  }
+
+  todays.forEach(entry => {
+    const li = document.createElement("li");
+    li.className = "logItem";
+
+    const when = new Date(entry.at || Date.now());
+    const hh = String(when.getHours()).padStart(2,"0");
+    const mm = String(when.getMinutes()).padStart(2,"0");
+
+    li.innerHTML = `
+      <span class="logTask" title="${escapeHtml(entry.task)}">${escapeHtml(entry.task)}</span>
+      <span class="logRight">
+        <span class="logMeta">${minutesLabel(entry.seconds)} · ${hh}:${mm}</span>
+        <button class="deleteBtn" type="button" data-id="${entry.id}" aria-label="Remove session" title="Remove">−</button>
+      </span>
+    `;
+    todayListEl.appendChild(li);
+  });
+}
+
+/* click handling for delete buttons */
+todayListEl.addEventListener("click", (e) => {
+  const btn = e.target.closest(".deleteBtn");
+  if (!btn) return;
+  removeSession(btn.dataset.id);
+});
+
+/* ---------- Visual background shift ---------- */
 function aurora(p){
-  // Keep hue drift inside aurora range but brighter
   const h1 = 155 + 95*p; // teal -> violet
   const h2 = 120 + 70*p; // green -> teal/blue
   const h3 = 215 + 34*p; // violet drift
-  const glow = .12 + .14*p; // brighter overall
+  const glow = .12 + .14*p;
 
   bodyEl.style.background = `
     radial-gradient(1200px 800px at 20% 10%, hsla(${h2},95%,66%,${glow}), transparent 62%),
@@ -370,6 +568,13 @@ function aurora(p){
     radial-gradient(1200px 820px at 55% 88%, hsla(${h1},95%,60%,${glow*.75}), transparent 60%),
     linear-gradient(180deg,#050c14,#091b2c)
   `;
+}
+
+/* ---------- Timer helpers ---------- */
+function format(sec){
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return `${m}:${String(s).padStart(2,"0")}`;
 }
 
 function refresh(){
@@ -397,6 +602,14 @@ function tick(){
 }
 
 function start(){
+  if (!taskEl.value.trim()){
+    taskEl.setCustomValidity("Please enter what you’ll work on for this session.");
+    taskEl.reportValidity();
+    taskEl.focus();
+    return;
+  }
+  taskEl.setCustomValidity("");
+
   if (interval) return;
   timerEl.classList.remove("done");
   interval = setInterval(tick, 1000);
@@ -424,6 +637,10 @@ function finish(){
   timerEl.classList.add("done");
   bodyEl.classList.remove("urgent");
   bodyEl.classList.add("finish");
+
+  addSession({ task: taskEl.value, seconds: total });
+  renderTodaySummary();
+
   refresh();
 }
 
@@ -436,6 +653,7 @@ function adjust(dir){
   refresh();
 }
 
+/* ---------- Wire events ---------- */
 minusBtn.onclick = () => adjust(-1);
 plusBtn.onclick  = () => adjust(1);
 
@@ -443,6 +661,10 @@ document.getElementById("startBtn").onclick = start;
 document.getElementById("pauseBtn").onclick = pause;
 document.getElementById("resetBtn").onclick = reset;
 
+taskEl.addEventListener("input", () => taskEl.setCustomValidity(""));
+
+/* ---------- Init ---------- */
+renderTodaySummary();
 refresh();
 </script>
 </body>
